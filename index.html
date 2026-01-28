@@ -154,7 +154,6 @@
         .student-repo {
             color: #666;
             font-size: 13px;
-            display: none;
         }
 
         .counter {
@@ -410,6 +409,11 @@
                 .then(data => {
                     // Decode base64 content from GitHub API
                     const html = atob(data.content);
+                    
+                    // Extract title from HTML
+                    const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+                    const title = titleMatch ? titleMatch[1] : 'Untitled';
+                    document.getElementById('studentRepo').textContent = title;
                     
                     // Use srcdoc to isolate the content and preserve its styles
                     const iframe = document.createElement('iframe');
