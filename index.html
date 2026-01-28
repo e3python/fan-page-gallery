@@ -357,20 +357,23 @@
             document.getElementById('prevBtn').disabled = currentIndex === 0;
             document.getElementById('nextBtn').disabled = currentIndex === students.length - 1;
 
-            // Load iframe
+            // Load content directly
             const container = document.getElementById('iframeContainer');
             container.innerHTML = `<div class="loading">Loading submission...</div>`;
             
-            const iframe = document.createElement('iframe');
-            iframe.src = student.url;
-            iframe.onload = function() {
-                container.innerHTML = '';
-                container.appendChild(iframe);
-            };
-            iframe.onerror = function() {
-                container.innerHTML = `<div class="error">Unable to load submission from: ${student.url}</div>`;
-            };
-            container.appendChild(iframe);
+            fetch(student.url)
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return response.text();
+                })
+                .then(html => {
+                    container.innerHTML = `<div style="overflow: auto; height: 100%; padding: 20px; background: white;">
+                        <div class="student-content">${html}</div>
+                    </div>`;
+                })
+                .catch(error => {
+                    container.innerHTML = `<div class="error">Unable to load submission: ${error.message}</div>`;
+                });
 
             // Update Giscus comments to point to this student
             updateGiscus(student.repo);
