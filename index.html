@@ -377,23 +377,16 @@
         }
 
         function updateGiscus(studentRepo) {
-            // Update the Giscus data attributes to point to this student's submission
+            // Remove old giscus iframe
             const giscusFrame = document.querySelector('iframe.giscus-frame');
             if (giscusFrame) {
                 giscusFrame.remove();
             }
             
-            // Update the giscus element attributes
-            const giscusElement = document.getElementById('giscus');
-            giscusElement.setAttribute('data-term', studentRepo);
-            
-            // Reload giscus
+            // Clear giscus state
             window.GISCUS_CALLBACK = undefined;
-            if (window.giscus) {
-                window.giscus.reset();
-            }
             
-            // Re-render giscus
+            // Re-render giscus with new term
             setTimeout(() => {
                 const script = document.createElement('script');
                 script.src = 'https://giscus.app/client.js';
@@ -413,7 +406,7 @@
                 script.async = true;
                 
                 const commentsSection = document.getElementById('commentsSection');
-                const oldScript = commentsSection.querySelector('script');
+                const oldScript = commentsSection.querySelector('script[src="https://giscus.app/client.js"]');
                 if (oldScript) {
                     oldScript.remove();
                 }
