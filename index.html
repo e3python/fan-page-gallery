@@ -228,6 +228,37 @@
                 <button id="prevBtn" onclick="showPrevious()">← Previous</button>
                 <button id="nextBtn" onclick="showNext()">Next →</button>
             </div>
+
+            <div id="commentsSection" style="padding: 20px; background: #f8f9fa; border-top: 1px solid #e0e0e0;">
+                <h3 style="margin-top: 0; color: #333;">💬 Gallery Feedback</h3>
+                <p style="color: #666; font-size: 14px; margin-bottom: 10px;">
+                    Sign in with GitHub to leave constructive feedback for this submission.
+                </p>
+                <div style="background: white; border-left: 4px solid #667eea; padding: 12px 15px; margin-bottom: 15px; border-radius: 4px;">
+                    <p style="margin: 0; color: #333; font-size: 13px; font-weight: 600; margin-bottom: 8px;">💡 Feedback Starters:</p>
+                    <ul style="margin: 8px 0; padding-left: 20px; color: #666; font-size: 13px;">
+                        <li style="margin-bottom: 4px;"><strong>"One thing I liked..."</strong></li>
+                        <li style="margin-bottom: 4px;"><strong>"One thing I wondered..."</strong></li>
+                        <li><strong>"One suggestion I have..."</strong></li>
+                    </ul>
+                </div>
+                <script src="https://giscus.app/client.js"
+                        id="giscus"
+                        data-repo="e3python/fan-page-gallery"
+                        data-repo-id="R_kgDOND8wfQ"
+                        data-category="Gallery Feedback"
+                        data-category-id="DIC_kwDOND8wfc4CkJBj"
+                        data-mapping="specific"
+                        data-term=""
+                        data-reactions-enabled="1"
+                        data-emit-metadata="0"
+                        data-input-position="bottom"
+                        data-theme="light"
+                        data-lang="en"
+                        crossorigin="anonymous"
+                        async>
+                </script>
+            </div>
         </div>
     </div>
 
@@ -331,6 +362,53 @@
                 container.innerHTML = `<div class="error">Unable to load submission from: ${student.url}</div>`;
             };
             container.appendChild(iframe);
+
+            // Update Giscus comments to point to this student
+            updateGiscus(student.repo);
+        }
+
+        function updateGiscus(studentRepo) {
+            // Update the Giscus data attributes to point to this student's submission
+            const giscusFrame = document.querySelector('iframe.giscus-frame');
+            if (giscusFrame) {
+                giscusFrame.remove();
+            }
+            
+            // Update the giscus element attributes
+            const giscusElement = document.getElementById('giscus');
+            giscusElement.setAttribute('data-term', studentRepo);
+            
+            // Reload giscus
+            window.GISCUS_CALLBACK = undefined;
+            if (window.giscus) {
+                window.giscus.reset();
+            }
+            
+            // Re-render giscus
+            setTimeout(() => {
+                const script = document.createElement('script');
+                script.src = 'https://giscus.app/client.js';
+                script.setAttribute('data-repo', 'e3python/fan-page-gallery');
+                script.setAttribute('data-repo-id', 'R_kgDOND8wfQ');
+                script.setAttribute('data-category', 'Gallery Feedback');
+                script.setAttribute('data-category-id', 'DIC_kwDOND8wfc4CkJBj');
+                script.setAttribute('data-mapping', 'specific');
+                script.setAttribute('data-term', studentRepo);
+                script.setAttribute('data-reactions-enabled', '1');
+                script.setAttribute('data-emit-metadata', '0');
+                script.setAttribute('data-input-position', 'bottom');
+                script.setAttribute('data-theme', 'light');
+                script.setAttribute('data-lang', 'en');
+                script.setAttribute('crossorigin', 'anonymous');
+                script.async = true;
+                
+                const commentsSection = document.getElementById('commentsSection');
+                const oldScript = commentsSection.querySelector('script');
+                if (oldScript) {
+                    oldScript.remove();
+                }
+                commentsSection.appendChild(script);
+            }, 100);
         }
 
         function showPrevious() {
