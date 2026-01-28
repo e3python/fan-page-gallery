@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery Walk - e3python</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        select, button {
+            padding: 10px 15px;
+            border: 2px solid #667eea;
+            border-radius: 6px;
+            background: white;
+            color: #333;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        select {
+            flex: 0 0 auto;
+            min-width: 150px;
+        }
+
+        select:hover {
+            border-color: #764ba2;
+            background: #f8f9ff;
+        }
+
+        button {
+            background: white;
+            padding: 10px 20px;
+        }
+
+        button:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .status {
+            color: #666;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .gallery {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .student-info {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .student-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .student-repo {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .counter {
+            color: #999;
+            font-size: 14px;
+        }
+
+        .iframe-container {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #666;
+            font-size: 16px;
+        }
+
+        .error {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #d32f2f;
+            font-size: 16px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .nav-buttons {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .nav-buttons button {
+            flex: 1;
+        }
+
+        .assignment-select {
+            font-weight: 600;
+        }
+
+        .empty-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #999;
+            font-size: 16px;
+            flex-direction: column;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 Gallery Walk</h1>
+            <div class="controls">
+                <label for="modSelect" style="margin-right: 10px; color: #333;">Select Module:</label>
+                <select id="modSelect" class="assignment-select">
+                    <option value="">-- Choose a module --</option>
+                    <option value="mod2">Mod 2 (933724)</option>
+                    <option value="mod3">Mod 3 (933725)</option>
+                    <option value="mod5">Mod 5 (933728)</option>
+                </select>
+                <span class="status">
+                    <span id="studentCount">Select a module</span>
+                </span>
+            </div>
+        </div>
+
+        <div class="gallery">
+            <div class="student-info">
+                <div>
+                    <div class="student-name" id="studentName">-</div>
+                    <div class="student-repo" id="studentRepo">-</div>
+                </div>
+                <div class="counter">
+                    <span id="currentIndex">0</span> / <span id="totalCount">0</span>
+                </div>
+            </div>
+
+            <div class="iframe-container" id="iframeContainer">
+                <div class="empty-state">
+                    <div>👈 Select a module to begin</div>
+                </div>
+            </div>
+
+            <div class="nav-buttons">
+                <button id="prevBtn" onclick="showPrevious()">← Previous</button>
+                <button id="nextBtn" onclick="showNext()">Next →</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const assignments = {
+            mod2: { id: 933724, name: 'Mod 2' },
+            mod3: { id: 933725, name: 'Mod 3' },
+            mod5: { id: 933728, name: 'Mod 5' }
+        };
+
+        const org = 'e3python';
+        let students = [];
+        let currentIndex = 0;
+        let currentMod = null;
+
+        const modSelect = document.getElementById('modSelect');
+        modSelect.addEventListener('change', loadStudents);
+
+        async function loadStudents() {
+            const selectedMod = modSelect.value;
+            if (!selectedMod) {
+                students = [];
+                currentIndex = 0;
+                updateDisplay();
+                return;
+            }
+
+            currentMod = selectedMod;
+            const assignmentId = assignments[selectedMod].id;
+
+            document.getElementById('studentCount').textContent = 'Loading...';
+            document.getElementById('iframeContainer').innerHTML = '<div class="loading">Fetching student submissions...</div>';
+
+            try {
+                // Fetch repos for this assignment using GitHub API
+                const response = await fetch(`https://api.github.com/search/repositories?q=org:${org}+archived:false&per_page=100`);
+                const data = await response.json();
+
+                // Filter repos that match the assignment pattern (e.g., mod2-*)
+                const modPattern = selectedMod.toLowerCase();
+                students = data.items
+                    .filter(repo => repo.name.toLowerCase().startsWith(modPattern + '-'))
+                    .map(repo => ({
+                        name: repo.name.split('-').slice(1).join('-') || 'Unknown',
+                        repo: repo.name,
+                        url: `https://raw.githubusercontent.com/${org}/${repo.name}/main/index.html`
+                    }))
+                    .sort((a, b) => a.name.localeCompare(b.name));
+
+                currentIndex = 0;
+
+                if (students.length === 0) {
+                    document.getElementById('iframeContainer').innerHTML = '<div class="error">No student submissions found for this module.</div>';
+                    document.getElementById('studentCount').textContent = '0 submissions';
+                    document.getElementById('totalCount').textContent = '0';
+                } else {
+                    document.getElementById('studentCount').textContent = `${students.length} submission${students.length !== 1 ? 's' : ''}`;
+                    updateDisplay();
+                }
+            } catch (error) {
+                console.error('Error fetching submissions:', error);
+                document.getElementById('iframeContainer').innerHTML = `<div class="error">Error loading submissions: ${error.message}</div>`;
+                document.getElementById('studentCount').textContent = 'Error';
+            }
+        }
+
+        function updateDisplay() {
+            if (students.length === 0) {
+                document.getElementById('studentName').textContent = '-';
+                document.getElementById('studentRepo').textContent = '-';
+                document.getElementById('currentIndex').textContent = '0';
+                document.getElementById('totalCount').textContent = '0';
+                document.getElementById('prevBtn').disabled = true;
+                document.getElementById('nextBtn').disabled = true;
+                if (!currentMod) {
+                    document.getElementById('iframeContainer').innerHTML = '<div class="empty-state"><div>👈 Select a module to begin</div></div>';
+                }
+                return;
+            }
+
+            const student = students[currentIndex];
+            document.getElementById('studentName').textContent = student.name;
+            document.getElementById('studentRepo').textContent = `Repository: ${student.repo}`;
+            document.getElementById('currentIndex').textContent = currentIndex + 1;
+            document.getElementById('totalCount').textContent = students.length;
+
+            document.getElementById('prevBtn').disabled = currentIndex === 0;
+            document.getElementById('nextBtn').disabled = currentIndex === students.length - 1;
+
+            // Load iframe
+            const container = document.getElementById('iframeContainer');
+            container.innerHTML = `<div class="loading">Loading submission...</div>`;
+            
+            const iframe = document.createElement('iframe');
+            iframe.src = student.url;
+            iframe.onload = function() {
+                container.innerHTML = '';
+                container.appendChild(iframe);
+            };
+            iframe.onerror = function() {
+                container.innerHTML = `<div class="error">Unable to load submission from: ${student.url}</div>`;
+            };
+            container.appendChild(iframe);
+        }
+
+        function showPrevious() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateDisplay();
+            }
+        }
+
+        function showNext() {
+            if (currentIndex < students.length - 1) {
+                currentIndex++;
+                updateDisplay();
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') showPrevious();
+            if (e.key === 'ArrowRight') showNext();
+        });
+    </script>
+</body>
+</html>
