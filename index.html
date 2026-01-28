@@ -146,19 +146,14 @@
             align-items: center;
         }
 
-        .student-name {
+        .student-title {
             font-weight: 600;
             color: #333;
         }
 
-        .student-repo {
-            color: #666;
-            font-size: 13px;
-        }
-
-        .counter {
+        .student-title.untitled {
+            font-style: italic;
             color: #999;
-            font-size: 14px;
         }
 
         .iframe-container {
@@ -247,10 +242,7 @@
             <div class="gallery-wrapper">
                 <div class="gallery-main">
                     <div class="student-info">
-                        <div>
-                            <div class="student-name" id="studentName">-</div>
-                            <div class="student-repo" id="studentRepo">-</div>
-                        </div>
+                        <div class="student-title" id="studentTitle">-</div>
                         <div class="counter">
                             <span id="currentIndex">0</span> / <span id="totalCount">0</span>
                         </div>
@@ -389,7 +381,6 @@
             }
 
             const student = students[currentIndex];
-            document.getElementById('studentName').textContent = student.name;
             document.getElementById('currentIndex').textContent = currentIndex + 1;
             document.getElementById('totalCount').textContent = students.length;
 
@@ -411,8 +402,15 @@
                     
                     // Extract title from HTML
                     const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
-                    const title = titleMatch ? titleMatch[1] : 'Untitled';
-                    document.getElementById('studentRepo').textContent = title;
+                    const titleElement = document.getElementById('studentTitle');
+                    
+                    if (titleMatch && titleMatch[1].trim()) {
+                        titleElement.textContent = titleMatch[1];
+                        titleElement.classList.remove('untitled');
+                    } else {
+                        titleElement.textContent = 'Untitled';
+                        titleElement.classList.add('untitled');
+                    }
                     
                     // Use srcdoc to isolate the content and preserve its styles
                     const iframe = document.createElement('iframe');
