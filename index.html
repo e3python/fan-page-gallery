@@ -313,7 +313,7 @@
                     .map(repo => ({
                         name: repo.name,
                         repo: repo.name,
-                        url: `https://raw.githubusercontent.com/${org}/${repo.name}/main/index.html`
+                        url: `https://api.github.com/repos/${org}/${repo.name}/contents/index.html`
                     }))
                     .sort((a, b) => a.name.localeCompare(b.name));
 
@@ -364,9 +364,11 @@
             fetch(student.url)
                 .then(response => {
                     if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                    return response.text();
+                    return response.json();
                 })
-                .then(html => {
+                .then(data => {
+                    // Decode base64 content from GitHub API
+                    const html = atob(data.content);
                     container.innerHTML = `<div style="overflow: auto; height: 100%; padding: 20px; background: white;">
                         <div class="student-content">${html}</div>
                     </div>`;
