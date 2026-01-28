@@ -369,9 +369,16 @@
                 .then(data => {
                     // Decode base64 content from GitHub API
                     const html = atob(data.content);
-                    container.innerHTML = `<div style="overflow: auto; height: 100%; padding: 20px; background: white;">
-                        <div class="student-content">${html}</div>
-                    </div>`;
+                    
+                    // Use srcdoc to isolate the content and preserve its styles
+                    const iframe = document.createElement('iframe');
+                    iframe.srcdoc = html;
+                    iframe.style.width = '100%';
+                    iframe.style.height = '100%';
+                    iframe.style.border = 'none';
+                    
+                    container.innerHTML = '';
+                    container.appendChild(iframe);
                 })
                 .catch(error => {
                     container.innerHTML = `<div class="error">Unable to load submission: ${error.message}</div>`;
