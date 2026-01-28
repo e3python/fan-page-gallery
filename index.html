@@ -288,22 +288,30 @@
             }
 
             currentMod = selectedMod;
-            const assignmentId = assignments[selectedMod].id;
 
             document.getElementById('studentCount').textContent = 'Loading...';
             document.getElementById('iframeContainer').innerHTML = '<div class="loading">Fetching student submissions...</div>';
 
             try {
-                // Fetch repos for this assignment using GitHub API
-                const response = await fetch(`https://api.github.com/search/repositories?q=org:${org}+archived:false&per_page=100`);
-                const data = await response.json();
+                // Map mods to their template repos
+                const templateRepos = {
+                    mod2: 'e3-web-design-mod2-fan-page-fan-page',
+                    mod3: 'e3-web-design-mod3-fan-page-fan-page',
+                    mod5: 'e3-web-design-mod5-fan-page-fan-page'
+                };
 
-                // Filter repos that match the assignment pattern (e.g., mod2-*)
-                const modPattern = selectedMod.toLowerCase();
-                students = data.items
-                    .filter(repo => repo.name.toLowerCase().startsWith(modPattern + '-'))
+                const templateRepo = templateRepos[selectedMod];
+                if (!templateRepo) {
+                    throw new Error('Invalid module selected');
+                }
+
+                // Fetch forks of the template repo (no indexing delay)
+                const response = await fetch(`https://api.github.com/repos/${org}/${templateRepo}/forks?per_page=100`);
+                const forks = await response.json();
+
+                students = forks
                     .map(repo => ({
-                        name: repo.name.split('-').slice(1).join('-') || 'Unknown',
+                        name: repo.name,
                         repo: repo.name,
                         url: `https://raw.githubusercontent.com/${org}/${repo.name}/main/index.html`
                     }))
