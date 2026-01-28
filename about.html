@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About the Gallery | HTML Mini-Project</title>
+    <style>
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --gray: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            background-color: var(--light);
+            color: var(--dark);
+        }
+
+        /* Navigation */
+        nav {
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--gray);
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .nav-links a.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 2px;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .mission-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 3rem;
+            border-left: 5px solid var(--primary);
+        }
+
+        .mission-card h2 {
+            margin-top: 0;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .mission-card strong {
+            color: var(--dark);
+        }
+
+        h3 {
+            color: var(--dark);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .spec-item {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            border-top: 3px solid var(--primary);
+        }
+
+        .spec-item h3 {
+            font-size: 1.1rem;
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+        }
+
+        .spec-item p {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+
+        .spec-item code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            color: #d32f2f;
+        }
+
+        .tag {
+            display: inline-block;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            padding: 0.5rem 1rem;
+            border-radius: 99px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: var(--dark);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray);
+            font-size: 0.9rem;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 4rem;
+        }
+
+        footer em {
+            color: var(--primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .hero h1 { font-size: 1.8rem; }
+            nav { flex-direction: column; gap: 1rem; }
+            .nav-links { flex-direction: column; gap: 1rem; }
+            .container { padding: 2rem 1rem; }
+            h3 { font-size: 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">🎨 Gallery Walk</div>
+        <div class="nav-links">
+            <a href="index.html">Gallery Home</a>
+            <a href="about.html" class="active">About the Project</a>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <h1>The Raw HTML Challenge</h1>
+        <p>Exploring the fundamental building blocks of the web, one tag at a time.</p>
+    </div>
+
+    <div class="container">
+        
+        <div class="mission-card">
+            <h2>Why Black & White?</h2>
+            <p>You might notice that the student projects in this gallery look... simple. There are no colors, no fancy layouts, and no photos. <strong>This is by design.</strong></p>
+            <p>Before an architect picks the paint color, they must pour the concrete foundation. In this unit, our engineers were challenged to build "Fan Pages" using strictly <strong>Semantic HTML</strong>. They were forbidden from using CSS styles to ensure they mastered the hierarchy of information first.</p>
+        </div>
+
+        <h3>The Engineering Constraints</h3>
+        <p>Every page in this gallery was built under the following strict conditions:</p>
+
+        <div class="specs-grid">
+            <div class="spec-item">
+                <h3>🚫 No CSS Allowed</h3>
+                <p>Students could not use colors, fonts, or alignment tools. If the content isn't organized logically, the page fails.</p>
+            </div>
+            <div class="spec-item">
+                <h3>🚫 No Image Files</h3>
+                <p>Since we haven't covered file paths yet, students had to use creative text placeholders to indicate where media belongs.</p>
+            </div>
+            <div class="spec-item">
+                <h3>✅ Semantic Tags Only</h3>
+                <p>The code must be readable by machines and humans. A title must be an H1, not just bold text.</p>
+            </div>
+            <div class="spec-item">
+                <h3>✅ Code Hygiene</h3>
+                <p>Every section of code is documented with HTML comments <code>&lt;!-- --&gt;</code> to explain the developer's intent.</p>
+            </div>
+        </div>
+
+        <h3>The Toolbox</h3>
+        <p>Students built these entire experiences using only these 4 foundational elements:</p>
+        <div style="margin-top: 1rem;">
+            <span class="tag">&lt;h1&gt; Headers</span>
+            <span class="tag">&lt;p&gt; Paragraphs</span>
+            <span class="tag">&lt;ul&gt; Lists</span>
+            <span class="tag">&lt;!-- --&gt; Comments</span>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>Intro to Computer Science • Unit 2: HTML & The Internet</p>
+        <p><em>"Structure before Style"</em></p>
+    </footer>
+
+</body>
+</html>
