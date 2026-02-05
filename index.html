@@ -398,7 +398,22 @@
                 })
                 .then(data => {
                     // Decode base64 content from GitHub API
-                    const html = atob(data.content);
+                    let html = atob(data.content);
+                    
+                    // Rewrite relative URLs to absolute GitHub raw content URLs
+                    const baseUrl = `https://raw.githubusercontent.com/${org}/${student.repo}/main/`;
+                    
+                    // Fix stylesheet links
+                    html = html.replace(/<link\s+([^>]*?)href=["'](?!(?:https?:|\/|#))([^"']+)["']/gi, 
+                        `<link $1href="${baseUrl}$2"`);
+                    
+                    // Fix image src
+                    html = html.replace(/<img\s+([^>]*?)src=["'](?!(?:https?:|\/|#|data:))([^"']+)["']/gi, 
+                        `<img $1src="${baseUrl}$2"`);
+                    
+                    // Fix script src
+                    html = html.replace(/<script\s+([^>]*?)src=["'](?!(?:https?:|\/|#))([^"']+)["']/gi, 
+                        `<script $1src="${baseUrl}$2"`);
                     
                     // Extract title from HTML
                     const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
