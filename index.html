@@ -425,10 +425,12 @@
                     for (const href of stylesheets) {
                         try {
                             // Handle relative URLs
-                            const cssUrl = href.startsWith('http') ? href : baseUrl + href;
-                            const cssResponse = await fetch(cssUrl);
+                            const cssPath = href.startsWith('http') ? href : href;
+                            const cssApiUrl = `https://api.github.com/repos/${org}/${student.repo}/contents/${cssPath}`;
+                            const cssResponse = await fetch(cssApiUrl);
                             if (cssResponse.ok) {
-                                const cssContent = await cssResponse.text();
+                                const cssData = await cssResponse.json();
+                                const cssContent = atob(cssData.content);
                                 inlineStyles += `<style>\n${cssContent}\n</style>\n    `;
                             }
                         } catch (err) {
