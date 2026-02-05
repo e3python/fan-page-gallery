@@ -400,20 +400,17 @@
                     // Decode base64 content from GitHub API
                     let html = atob(data.content);
                     
-                    // Rewrite relative URLs to absolute GitHub raw content URLs
+                    // Add <base> tag to resolve relative URLs to the student's repo
                     const baseUrl = `https://raw.githubusercontent.com/${org}/${student.repo}/main/`;
+                    const baseTag = `<base href="${baseUrl}">`;
                     
-                    // Fix stylesheet links
-                    html = html.replace(/<link\s+([^>]*?)href=["'](?!(?:https?:|\/|#))([^"']+)["']/gi, 
-                        `<link $1href="${baseUrl}$2"`);
+                    // Insert base tag into the head
+                    html = html.replace(/<head[^>]*>/i, match => match + '\n    ' + baseTag);
                     
-                    // Fix image src
-                    html = html.replace(/<img\s+([^>]*?)src=["'](?!(?:https?:|\/|#|data:))([^"']+)["']/gi, 
-                        `<img $1src="${baseUrl}$2"`);
-                    
-                    // Fix script src
-                    html = html.replace(/<script\s+([^>]*?)src=["'](?!(?:https?:|\/|#))([^"']+)["']/gi, 
-                        `<script $1src="${baseUrl}$2"`);
+                    // If no head tag exists, add one
+                    if (!/<head/i.test(html)) {
+                        html = html.replace(/<html[^>]*>/i, match => match + '\n<head>' + baseTag + '</head>');
+                    }
                     
                     // Extract title from HTML
                     const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
