@@ -396,13 +396,21 @@
                     if (!response.ok) throw new Error(`HTTP ${response.status}`);
                     return response.json();
                 })
-                .then(data => {
+                .then(async data => {
                     // Decode base64 content from GitHub API
                     let html = atob(data.content);
                     
                     // Add <base> tag to resolve relative URLs to the student's repo
                     const baseUrl = `https://raw.githubusercontent.com/${org}/${student.repo}/main/`;
                     const baseTag = `<base href="${baseUrl}">`;
+                    
+                    // Extract stylesheet hrefs before inserting base tag
+                    const linkRegex = /<link[^>]*href=["']([^"']+)["'][^>]*>/gi;
+                    const stylesheets = [];
+                    let match;
+                    while ((match = linkRegex.exec(html)) !== null) {
+                        stylesheets.push(match[1]);
+                    }
                     
                     // Insert base tag into the head
                     html = html.replace(/<head[^>]*>/i, match => match + '\n    ' + baseTag);
@@ -411,6 +419,26 @@
                     if (!/<head/i.test(html)) {
                         html = html.replace(/<html[^>]*>/i, match => match + '\n<head>' + baseTag + '</head>');
                     }
+                    
+                    // Fetch stylesheets and convert to inline <style> tags
+                    let inlineStyles = '';
+                    for (const href of stylesheets) {
+                        try {
+                            // Handle relative URLs
+                            const cssUrl = href.startsWith('http') ? href : baseUrl + href;
+                            const cssResponse = await fetch(cssUrl);
+                            if (cssResponse.ok) {
+                                const cssContent = await cssResponse.text();
+                                inlineStyles += `<style>\n${cssContent}\n</style>\n    `;
+                            }
+                        } catch (err) {
+                            console.warn(`Failed to load stylesheet: ${href}`, err);
+                        }
+                    }
+                    
+                    // Remove external stylesheets and add inline styles
+                    html = html.replace(/<link[^>]*rel=["']stylesheet["'][^>]*>/gi, '');
+                    html = html.replace(/<head[^>]*>/i, match => match + '\n    ' + inlineStyles);
                     
                     // Extract title from HTML
                     const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
